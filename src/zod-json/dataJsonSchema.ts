@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { calculateSumOfAllCosts } from "../utils/calculateSumOfAllCosts"; // Adjust path as needed
 
 const DistraineeSchema = z.object({
   peselNumber: z.number(),
@@ -25,20 +26,7 @@ const IndicatedAmountsSchema = z
     clauseCosts: z.number().optional(),
     transferFee: z.number().optional(),
   })
-  .transform((amounts) => {
-    // Calculate the base sum of indicated amounts excluding transferFee itself
-    const baseSum = Object.entries(amounts)
-      .filter(([key, value]) => key !== "transferFee" && value !== undefined)
-      .reduce((acc, [, value]) => acc + (value as number), 0);
-
-    const transferFeeMultiplier = Object.entries(amounts)
-      .filter(([key, value]) => key !== "transferFee" && value !== undefined && value !== 0)
-      .length;
-
-    const totalWithTransferFee = baseSum + (amounts.transferFee ?? 0) * transferFeeMultiplier;
-
-    return { ...amounts, sumOfAllCosts: parseFloat(totalWithTransferFee.toFixed(2)) };
-  });
+  .transform(calculateSumOfAllCosts);
 
 export const BailifData = z.object({
   personalInfo: z.object({
