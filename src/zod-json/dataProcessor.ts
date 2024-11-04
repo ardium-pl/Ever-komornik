@@ -26,6 +26,7 @@ export async function parseOcrText(ocrText: string): Promise<BailifDataType> {
             4. Detect if the phrase "Do każdej przekazywanej kwoty należy doliczyć opłatę za przelew ..." appears in the OCR text. If it does:
               - Extract the fee amount mentioned after this phrase.
             5. companyIdentification is always a name of the company as a string, mostly begins with the name 'Ever ...'.
+            6. In the kmNumber don't write the letters 'Km' as a prefix.
           `,
       },
       { role: "user", content: ocrText },

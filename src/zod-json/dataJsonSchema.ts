@@ -10,7 +10,6 @@ const DistraineeSchema = z.object({
 const BailifSchema = z.object({
   name: z.string(),
   lastName: z.string(),
-  kmNumber: z.string(),
   phoneNumber: z.number(),
   mail: z.string(),
 });
@@ -47,7 +46,7 @@ export const BailifData = z.object({
     bailif: BailifSchema,
   }),
   caseDetails: z.object({
-    caseNumber: z.string(),
+    kmNumber: z.string(),
     bankAccountNumber: z.string(),
     companyIdentification: z.string(),
   }),
