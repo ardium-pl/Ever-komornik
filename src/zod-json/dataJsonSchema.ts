@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { calculateSumOfAllCosts } from "../utils/calculateSumOfAllCosts"; // Adjust path as needed
+import { calculateSumOfAllCosts } from "../utils/calculateSumOfAllCosts";
 
 const DistraineeSchema = z.object({
   peselNumber: z.number(),
