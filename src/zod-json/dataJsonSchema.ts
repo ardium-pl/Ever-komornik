@@ -23,14 +23,22 @@ const IndicatedAmountsSchema = z
     costsOfPreviousEnforcement: z.number().optional(),
     executionFee: z.number().optional(),
     cashExpenses: z.number().optional(),
+    clauseCosts: z.number().optional(),
+    transferFee: z.number().optional(),
   })
   .transform((amounts) => {
-    // Calculate the sum of all indicated amounts, considering optional fields
-    const sumOfAllCosts = Object.values(amounts)
-      .filter((value) => value !== undefined)
-      .reduce((acc, value) => acc + (value as number), 0);
+    // Calculate the base sum of indicated amounts excluding transferFee itself
+    const baseSum = Object.entries(amounts)
+      .filter(([key, value]) => key !== "transferFee" && value !== undefined)
+      .reduce((acc, [, value]) => acc + (value as number), 0);
 
-    return { ...amounts, sumOfAllCosts };
+    const transferFeeMultiplier = Object.entries(amounts)
+      .filter(([key, value]) => key !== "transferFee" && value !== undefined && value !== 0)
+      .length;
+
+    const totalWithTransferFee = baseSum + (amounts.transferFee ?? 0) * transferFeeMultiplier;
+
+    return { ...amounts, sumOfAllCosts: parseFloat(totalWithTransferFee.toFixed(2)) };
   });
 
 export const BailifData = z.object({
@@ -46,7 +54,6 @@ export const BailifData = z.object({
   financials: IndicatedAmountsSchema,
 });
 
-// Define the type with the sum included in IndicatedAmountsSchema
 export type BailifDataType = z.infer<typeof BailifData> & {
   financials: { sumOfAllCosts: number };
 };

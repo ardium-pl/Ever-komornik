@@ -11,6 +11,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
 const app = express();
 const PDF_DATA_FOLDER = path.join(__dirname, 'ever-data');
+const JSON_DATA_FOLDER = path.join(__dirname, 'json-data');
 
 app.listen(PORT, () => {
   logger.info(`Server is running on port ${PORT}`);
@@ -27,6 +28,11 @@ async function processFile(fileName: string) {
 
     const parsedData = await parseOcrText(ocrDataText);
     logger.info("JSON Schema: ", parsedData);
+
+    await fs.mkdir(JSON_DATA_FOLDER, { recursive: true });
+    const jsonFilePath = path.join(JSON_DATA_FOLDER, `${path.parse(fileName).name}.json`);
+    await fs.writeFile(jsonFilePath, JSON.stringify(parsedData, null, 2));
+    logger.info(`✅ JSON data saved to ${jsonFilePath}`);
   } catch (err) {
     logger.error(`Error processing file ${fileName}: ${err.message}`);
   }

@@ -15,15 +15,17 @@ export async function parseOcrText(ocrText: string): Promise<BailifDataType> {
     messages: [
       {
         role: "system",
-        content:
-          `You are an expert in parsing bailif execution data from OCR text. Extract the relevant information and 
-          structure it according to the provided schema. 
-          Please remember to obey those rules:
-          1. Almost all data should be provided(except the nipNumber and courtCosts, they are optional) so dont leave empty properties.
-          2. Be sure that all numeric data are numbers, not strings.
-          3. For indicatedAmounts:
-            some of the names can be written differently in polish e.g. "Koszty procesu" and "Koszty sądowe" are the same costs, but written differently.
-            This is the one example, but there might be also some other differences in other bailing execution, so whatch out for these data. 
+        content: `
+            You are an expert in parsing bailiff execution data from OCR text. Extract the relevant information and structure it according to the provided schema. 
+            Please remember to obey these rules:
+            1. Almost all data should be provided (except nipNumber and courtCosts, which are optional).
+            2. Ensure all numeric data are numbers, not strings.
+            3. For indicatedAmounts:
+              - Some terms may vary in Polish (e.g., "Koszty procesu" and "Koszty sądowe" refer to the same costs but are written differently). Watch for these variations in data.
+              - "Koszty klauzuli" are pretty rare, so expect that they are mostly not mentioned in the data, they are always written as "Koszty klauzuli".
+            4. Detect if the phrase "Do każdej przekazywanej kwoty należy doliczyć opłatę za przelew ..." appears in the OCR text. If it does:
+              - Extract the fee amount mentioned after this phrase.
+            5. companyIdentification is always a name of the company as a string, mostly begins with the name 'Ever ...'.
           `,
       },
       { role: "user", content: ocrText },
