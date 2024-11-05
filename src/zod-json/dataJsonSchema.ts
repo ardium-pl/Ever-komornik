@@ -2,16 +2,16 @@ import { z } from "zod";
 import { calculateSumOfAllCosts } from "../utils/calculateSumOfAllCosts";
 
 const DistraineeSchema = z.object({
-  peselNumber: z.number(),
+  peselNumber: z.string().optional(),
   name: z.string(),
   lastName: z.string(),
-  nipNumber: z.number().optional(),
+  nipNumber: z.string().optional(),
 });
 
 const BailifSchema = z.object({
   name: z.string(),
   lastName: z.string(),
-  phoneNumber: z.number(),
+  phoneNumber: z.string().optional(),
   mail: z.string(),
 });
 

@@ -27,6 +27,7 @@ export async function parseOcrText(ocrText: string): Promise<BailifDataType> {
               - Extract the fee amount mentioned after this phrase.
             5. companyIdentification is always a name of the company as a string, mostly begins with the name 'Ever ...'.
             6. In the kmNumber don't write the letters 'Km' as a prefix.
+            7. Sometimes peselNumber might not occur in the data, when it's not provided, just use the key peselNumber as optional.
           `,
       },
       { role: "user", content: ocrText },
