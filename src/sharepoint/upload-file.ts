@@ -3,7 +3,7 @@ import { Client } from "@microsoft/microsoft-graph-client";
 import "dotenv/config";
 import { logger } from "../utils/logger.ts";
 import { BailifDataType } from "../zod-json/dataJsonSchema.ts";
-import fs from 'fs/promises';
+import fs from "fs/promises";
 
 const clientId = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;
@@ -11,7 +11,7 @@ const tenantId = process.env.TENANT_ID;
 const siteId = process.env.SHAREPOINT_SITE_ID;
 const listId = process.env.SHAREPOINT_LIST_ID;
 
-function _getGraphClient() {
+async function _getGraphClient() {
   logger.info("Initializing ClientSecretCredential...");
 
   if (!clientId || !clientSecret || !tenantId) {
@@ -28,7 +28,6 @@ function _getGraphClient() {
       clientId,
       clientSecret
     );
-
     logger.info("Creating Microsoft Graph client with middleware...");
     return Client.initWithMiddleware({
       authProvider: {
@@ -38,9 +37,7 @@ function _getGraphClient() {
             "https://graph.microsoft.com/.default"
           );
           if (token?.token) {
-            logger.info(
-              "Access token retrieved successfully. : " + token.token
-            );
+            logger.info("Access token retrieved successfully.");
             return token.token;
           } else {
             logger.error("Failed to retrieve access token.");
@@ -57,36 +54,47 @@ function _getGraphClient() {
 
 export async function uploadDataToSharePointList(
   data: BailifDataType,
-  fileName: string
+  fileName: string,
+  pdfFilePath: string
 ) {
   logger.info("Preparing to upload data to SharePoint list...");
 
   const listItem = {
-    fields: {
-      Title: fileName,
-      "Nazwafirmy": data.caseDetails.companyIdentification,
-    },
-  };
-
-  try {
-    const client = _getGraphClient();
+      fields: {
+          Title: fileName,
+          Nazwafirmy: data.caseDetails.companyIdentification,
+          
+        },
+    };
+    
+    try {
+    const client = await _getGraphClient();
     if (!client) {
-      logger.error("Graph client initialization failed.");
-      return;
+        logger.error("Graph client initialization failed.");
+        return;
     }
-
+    
     logger.info(
-      `Attempting to upload data to SharePoint list: ${listId} on site: ${siteId}`
+        `Uploading data to SharePoint list: ${listId} on site: ${siteId}`
     );
-    logger.debug("List Item Payload: " + JSON.stringify(listItem));
-
-    await client
-      .api(`/sites/${siteId}/lists/${listId}/items`)
-      .post({ fields: listItem.fields });
-
+    const createdItem = await client
+    .api(`/sites/${siteId}/lists/${listId}/items`)
+    .post({ fields: listItem.fields });
+    const itemId = createdItem.id;
     logger.info("✅ Data uploaded as a list item to SharePoint successfully.");
-  } catch (error: any) {
-    logger.error(`Error uploading data to SharePoint list: ${error.message}`);
+    
+    // Alternative: Upload the PDF as a file in a library folder
+    const uploadPath = `/sites/${siteId}/drive/root:/PDF/${fileName}:/content`;
+    
+    const fileContent = await fs.readFile(pdfFilePath);
+    await client.api(uploadPath).put(fileContent);
+    logger.info(
+        "📎 PDF file uploaded as a file to SharePoint library successfully."
+    );
+} catch (error: any) {
+    logger.error(
+      `Error uploading data or file to SharePoint: ${error.message}`
+    );
     logger.debug(`Stack trace: ${error.stack}`);
   }
 }

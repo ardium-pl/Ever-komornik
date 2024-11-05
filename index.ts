@@ -28,7 +28,7 @@ async function processFile(fileName: string) {
     
     const parsedData = await parseOcrText(ocrDataText);
     logger.info("JSON Schema: ", parsedData);
-    await uploadDataToSharePointList(parsedData, fileName);
+    await uploadDataToSharePointList(parsedData, fileName, pdfFilePath);
 
     await fs.mkdir(JSON_DATA_FOLDER, { recursive: true });
     const jsonFilePath = path.join(JSON_DATA_FOLDER, `${path.parse(fileName).name}.json`);
