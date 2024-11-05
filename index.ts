@@ -1,11 +1,11 @@
 import express from "express";
-import cron from "node-cron";
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { pdfOcr } from "./src/ocr/ocr.ts";
 import { logger } from "./src/utils/logger.ts";
 import { parseOcrText } from "./src/zod-json/dataProcessor";
-import path from 'path';
-import fs from 'fs/promises';
-import { fileURLToPath } from 'url';
+import { uploadDataToSharePointList} from "./src/sharepoint/upload-file.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
@@ -22,12 +22,13 @@ async function processFile(fileName: string) {
     logger.info(` 🧾 Reading PDF: ${fileName}`);
     const pdfFilePath = path.join(PDF_DATA_FOLDER, fileName);
     logger.info(`🧾 PDF path: ${pdfFilePath}`);
-
+    
     const ocrDataText = await pdfOcr(pdfFilePath);
     logger.info(`📄 OCR Data Text: ${ocrDataText}`);
-
+    
     const parsedData = await parseOcrText(ocrDataText);
     logger.info("JSON Schema: ", parsedData);
+    await uploadDataToSharePointList(parsedData, fileName);
 
     await fs.mkdir(JSON_DATA_FOLDER, { recursive: true });
     const jsonFilePath = path.join(JSON_DATA_FOLDER, `${path.parse(fileName).name}.json`);

@@ -8,8 +8,11 @@
     "start": "tsx index.ts"
   },
   "dependencies": {
+    "@azure/identity": "^4.5.0",
+    "@azure/msal-node": "^2.15.0",
     "@google-cloud/storage": "^7.12.1",
     "@google-cloud/vision": "^4.3.2",
+    "@microsoft/microsoft-graph-client": "^3.0.7",
     "camelcase": "^8.0.0",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
