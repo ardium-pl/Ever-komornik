@@ -26,7 +26,10 @@ const IndicatedAmountsSchema = z
     clauseCosts: z.number().optional(),
     transferFee: z.number().optional(),
   })
-  .transform(calculateSumOfAllCosts);
+  .transform((amounts) => ({
+    ...amounts,
+    ...calculateSumOfAllCosts(amounts),
+  }));
 
 export const BailifData = z.object({
   personalInfo: z.object({
@@ -41,6 +44,5 @@ export const BailifData = z.object({
   financials: IndicatedAmountsSchema,
 });
 
-export type BailifDataType = z.infer<typeof BailifData> & {
-  financials: { sumOfAllCosts: number };
-};
+export type BailifDataType = z.infer<typeof BailifData>;
+export type IndicatedAmountsSchemaType = z.infer<typeof IndicatedAmountsSchema>;

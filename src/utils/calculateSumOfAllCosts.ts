@@ -10,6 +10,6 @@ export function calculateSumOfAllCosts(amounts: Record<string, number | undefine
   
     const totalWithTransferFee = baseSum + (amounts.transferFee ?? 0) * transferFeeMultiplier;
   
-    return { ...amounts, sumOfAllCosts: parseFloat(totalWithTransferFee.toFixed(2)) };
+    return { sumOfAllCosts: parseFloat(totalWithTransferFee.toFixed(2)) };
   }
   
