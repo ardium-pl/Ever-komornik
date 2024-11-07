@@ -18,7 +18,7 @@ const VISION_AUTH = {
       "\n"
     ), // Handling the private key newline issue
   },
-  fallback: true, // Force use of REST API instead of gRPC
+  fallback: true,
 };
 
 export async function pdfOcr(pdfFilePath: string): Promise<string> {
@@ -65,7 +65,6 @@ export async function pdfOcr(pdfFilePath: string): Promise<string> {
       ` 💚 Successfully processed and saved the OCR results for ${pdfFilePath}`
     );
 
-    // Delete the image files after processing
     for (const imageFilePath of imageFilePaths) {
       logger.warn(`Deleting temporary image: ${imageFilePath}`);
       deleteFile(imageFilePath);
@@ -113,7 +112,6 @@ export async function fileOcr(
     return { googleVisionText };
   } catch (err: any) {
     logger.error(`Error during Google Vision OCR processing: ${err.message}`);
-    // Instead of throwing an error, we'll just log it and continue
     return null;
   }
 }
