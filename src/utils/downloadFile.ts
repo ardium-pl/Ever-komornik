@@ -2,6 +2,7 @@ import fs from "fs";
 import { google } from "googleapis";
 import path from "path";
 import {driveAuth} from "../utils/credentials";
+import { logger } from "./logger";
 
 export async function downloadFile(fileId: string, saveFolder: string, fileName: string) {
   const drive = google.drive({ version: "v3", auth: driveAuth });
@@ -27,11 +28,11 @@ export async function downloadFile(fileId: string, saveFolder: string, fileName:
     await new Promise<void>((resolve, reject) => {
       res.data
         .on("end", () => {
-          console.log("Done downloading file.");
+          logger.info("Done downloading file.");
           resolve();
         })
         .on("error", (err) => {
-          console.error("Error downloading file.");
+          logger.error("Error downloading file.");
           reject(err);
         })
         .pipe(dest);
@@ -39,7 +40,7 @@ export async function downloadFile(fileId: string, saveFolder: string, fileName:
 
     return pdfFilePath;
   } catch (err) {
-    console.error(`Error downloading file ${fileId}:`, err);
+    logger.error(`Error downloading file ${fileId}:`, err);
     throw err;
   }
 }

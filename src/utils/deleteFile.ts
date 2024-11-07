@@ -1,13 +1,14 @@
 import fs from "fs";
+import { logger } from "./logger";
 
 export function deleteFile(filePath: string) {
   try {
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
     } else {
-      console.log(`File not found: ${filePath}`);
+      logger.info(`File not found: ${filePath}`);
     }
   } catch (err) {
-    console.error(`Error deleting file ${filePath}:`, err);
+    logger.error(`Error deleting file ${filePath}:`, err);
   }
 }

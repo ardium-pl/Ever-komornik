@@ -1,6 +1,7 @@
 import { google, sheets_v4 } from "googleapis";
 import { sheetsAuth, sheetName } from "../utils/credentials";
 import { BailifDataType } from "../zod-json/dataJsonSchema";
+import { logger } from "../utils/logger";
 
 const authClient =
   (await sheetsAuth.getClient()) as sheets_v4.Params$Resource$Spreadsheets$Values$Append["auth"];
@@ -20,7 +21,7 @@ async function getLastRow(spreadsheetId: string): Promise<number> {
       return 0;
     }
   } catch (error) {
-    console.error("Error fetching last row:", error);
+    logger.error("Error fetching last row:", error);
     throw error;
   }
 }
@@ -98,10 +99,10 @@ export async function uploadDataToSheet(
       },
     });
 
-    console.log("Data uploaded successfully:", response.data);
+    logger.info("Data uploaded successfully:", response.data);
 
     await setRowStyles(spreadsheetId, nextRow);
   } catch (error) {
-    console.error("Error uploading data:", error);
+    logger.error("Error uploading data:", error);
   }
 }

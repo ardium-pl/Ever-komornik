@@ -1,6 +1,7 @@
-import { google, drive_v3 } from "googleapis";
+import { drive_v3, google } from "googleapis";
 import { GaxiosResponse } from "googleapis-common";
-import { FOLDER_ID, driveAuth } from "../utils/credentials";
+import { driveAuth } from "../utils/credentials";
+import { logger } from "../utils/logger";
 
 export async function listAllFiles(folderId: string): Promise<drive_v3.Schema$File[]> {
   const drive = google.drive({ version: "v3", auth: driveAuth });
@@ -43,12 +44,10 @@ export async function listAllFiles(folderId: string): Promise<drive_v3.Schema$Fi
 
       return allFiles;
     } catch (err) {
-      console.error("Error listing files:", err);
+      logger.error("Error listing files:", err);
       throw err;
     }
   }
 
   return await listFilesInFolder(folderId);
 }
-if(FOLDER_ID)
-console.log(await listAllFiles(FOLDER_ID));
