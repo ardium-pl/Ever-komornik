@@ -31,7 +31,6 @@ export async function listAllFiles(folderId: string): Promise<drive_v3.Schema$Fi
 
         allFiles = allFiles.concat(folderFiles);
 
-        // Recursively get files from subfolders
         for (const subfolder of subfolders) {
           if (subfolder.id) {
             const subfolderFiles = await listFilesInFolder(subfolder.id);
