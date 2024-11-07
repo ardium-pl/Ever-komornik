@@ -2,11 +2,13 @@ import express from "express";
 import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
-import { uploadPdfFileToDrive } from "./src/google-apis/google-drive-api.ts";
+import { FOLDER_ID } from "./src/google-apis/google-drive-api.ts";
+import { uploadDataToSheet } from "./src/google-apis/google-sheets-api";
+import { listAllFiles } from "./src/google-apis/list-all-files";
 import { pdfOcr } from "./src/ocr/ocr.ts";
 import { logger } from "./src/utils/logger.ts";
 import { parseOcrText } from "./src/zod-json/dataProcessor";
-import { uploadDataToSheet} from "./src/google-apis/google-sheets-api"
+import { downloadFile } from "./src/utils/downloadFile";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
@@ -19,10 +21,10 @@ app.listen(PORT, () => {
   logger.info(`Server is running on port ${PORT}`);
 });
 
-async function processFile(fileName: string) {
+async function processFile(fileName: string, fileId: string) {
   try {
     logger.info(` 🧾 Reading PDF: ${fileName}`);
-    const pdfFilePath = path.join(PDF_DATA_FOLDER, fileName);
+    const pdfFilePath = await downloadFile(fileId, PDF_DATA_FOLDER, fileName);
     logger.info(`🧾 PDF path: ${pdfFilePath}`);
 
     const ocrDataText = await pdfOcr(pdfFilePath);
@@ -31,17 +33,12 @@ async function processFile(fileName: string) {
     const parsedData = await parseOcrText(ocrDataText);
     logger.info("JSON Schema: ", parsedData);
 
-    logger.info("Uploading file to drive");
-    const fileLink = await uploadPdfFileToDrive(pdfFilePath, fileName, "application/pdf");
-    if(fileLink){
-        await uploadDataToSheet(SPREADSHEET_ID, 'Dane', parsedData, fileLink)
-    } else{
-        logger.error("File link was not created properly");
+    const fileLink = `https://drive.google.com/file/d/${fileId}/view`;
+    if (fileLink) {
+      await uploadDataToSheet(SPREADSHEET_ID, "Dane", parsedData, fileLink);
+    } else {
+      logger.error("File link was not created properly");
     }
-
-
-
-
 
     await fs.mkdir(JSON_DATA_FOLDER, { recursive: true });
     const jsonFilePath = path.join(
@@ -57,15 +54,16 @@ async function processFile(fileName: string) {
 
 async function main() {
   try {
-    const files = await fs.readdir(PDF_DATA_FOLDER);
+    if (FOLDER_ID) {
+      const files = await listAllFiles(FOLDER_ID);
 
-    if (files.length === 0) {
-      logger.info("No files found to process.");
-      return;
+      if (files.length === 0) {
+        logger.info("No files found to process.");
+        return;
+      }
+      await Promise.all(files.map((file) => processFile(file.name!, file.id!)));
+      logger.info("All files processed successfully.");
     }
-
-    await Promise.all(files.map((file) => processFile(file)));
-    logger.info("All files processed successfully.");
   } catch (err) {
     logger.error(`An error occurred during file processing: ${err.message}`);
   }

@@ -1,12 +1,10 @@
 import vision from "@google-cloud/vision";
-import dotenv from "dotenv";
+import "dotenv/config";
 import fs from "fs-extra";
 import path from "path";
 import { convertPdfToImages } from "../utils/convertPdfToImages";
 import { deleteFile } from "../utils/deleteFile";
 import { logger } from "../utils/logger";
-
-dotenv.config();
 
 type OcrResult = {
   googleVisionText: string;

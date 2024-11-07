@@ -6,10 +6,10 @@ import { logger } from '../utils/logger';
 
 export const GOOGLE_SHEETS_ACCOUNT = JSON.parse(process.env.GOOGLE_SHEETS_ACCOUNT as string);
 
-const FOLDER_ID = process.env.FOLDER_ID;
-const auth = new google.auth.GoogleAuth({
+export const FOLDER_ID = process.env.FOLDER_ID;
+export const auth = new google.auth.GoogleAuth({
   credentials: GOOGLE_SHEETS_ACCOUNT,
-  scopes: ['https://www.googleapis.com/auth/drive.file'],
+  scopes: ['https://www.googleapis.com/auth/drive'],
 }); 
 
 
