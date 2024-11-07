@@ -1,9 +1,9 @@
 import { ClientSecretCredential } from "@azure/identity";
 import { Client } from "@microsoft/microsoft-graph-client";
 import "dotenv/config";
-import { logger } from "../utils/logger.ts";
-import { BailifDataType, IndicatedAmountsSchemaType } from "../zod-json/dataJsonSchema.ts";
 import fs from "fs/promises";
+import { logger } from "../utils/logger.ts";
+import { BailifDataType } from "../zod-json/dataJsonSchema.ts";
 import { FieldNames, mapFields } from "./fields.ts";
 
 const clientId = process.env.CLIENT_ID;
