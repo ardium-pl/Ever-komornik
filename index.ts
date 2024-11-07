@@ -7,6 +7,7 @@ import { pdfOcr } from "./src/ocr/ocr.ts";
 import { FOLDER_ID, PDF_DATA_FOLDER, JSON_DATA_FOLDER, SPREADSHEET_ID } from "./src/utils/credentials";
 import { downloadFile } from "./src/utils/downloadFile";
 import { logger } from "./src/utils/logger.ts";
+import "dotenv/config";
 import { parseOcrText } from "./src/zod-json/dataProcessor";
 
 const PORT = process.env.PORT || 3000;
@@ -57,7 +58,10 @@ async function main() {
         logger.info("No files found to process.");
         return;
       }
-      await Promise.all(files.map((file) => processFile(file.name!, file.id!)));
+      for(const file of files){
+        await processFile(file.name!, file.id!);
+      }
+    //   await Promise.all(files.map((file) => processFile(file.name!, file.id!)));
       logger.info("All files processed successfully.");
     }
   } catch (err) {
