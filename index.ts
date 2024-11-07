@@ -1,21 +1,16 @@
 import express from "express";
-import fs from "fs/promises";
+import fs from "fs-extra";
 import path from "path";
-import { fileURLToPath } from "url";
-import { FOLDER_ID } from "./src/google-apis/google-drive-api.ts";
 import { uploadDataToSheet } from "./src/google-apis/google-sheets-api";
-import { listAllFiles } from "./src/google-apis/list-all-files";
+import { listAllFiles } from "./src/google-apis/google-drive-api.ts";
 import { pdfOcr } from "./src/ocr/ocr.ts";
+import { FOLDER_ID, PDF_DATA_FOLDER, JSON_DATA_FOLDER, SPREADSHEET_ID } from "./src/utils/credentials";
+import { downloadFile } from "./src/utils/downloadFile";
 import { logger } from "./src/utils/logger.ts";
 import { parseOcrText } from "./src/zod-json/dataProcessor";
-import { downloadFile } from "./src/utils/downloadFile";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
-const SPREADSHEET_ID = process.env.SPREADSHEET_ID as string;
 const app = express();
-const PDF_DATA_FOLDER = path.join(__dirname, "ever-data");
-const JSON_DATA_FOLDER = path.join(__dirname, "json-data");
 
 app.listen(PORT, () => {
   logger.info(`Server is running on port ${PORT}`);
@@ -23,6 +18,7 @@ app.listen(PORT, () => {
 
 async function processFile(fileName: string, fileId: string) {
   try {
+    fs.ensureDir(PDF_DATA_FOLDER);
     logger.info(` 🧾 Reading PDF: ${fileName}`);
     const pdfFilePath = await downloadFile(fileId, PDF_DATA_FOLDER, fileName);
     logger.info(`🧾 PDF path: ${pdfFilePath}`);
@@ -34,10 +30,10 @@ async function processFile(fileName: string, fileId: string) {
     logger.info("JSON Schema: ", parsedData);
 
     const fileLink = `https://drive.google.com/file/d/${fileId}/view`;
-    if (fileLink) {
+    if (fileLink && SPREADSHEET_ID) {
       await uploadDataToSheet(SPREADSHEET_ID, "Dane", parsedData, fileLink);
     } else {
-      logger.error("File link was not created properly");
+      logger.error("File link or spreadsheetId was not created properly");
     }
 
     await fs.mkdir(JSON_DATA_FOLDER, { recursive: true });

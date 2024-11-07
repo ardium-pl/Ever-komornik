@@ -49,6 +49,7 @@ web_modules/
 ever-data/
 output-text/
 json-data/
+images/
 
 # TypeScript cache
 *.tsbuildinfo

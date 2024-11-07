@@ -1,16 +1,9 @@
 import { google, sheets_v4 } from "googleapis";
-import { GoogleAuth } from "google-auth-library";
+import { sheetsAuth, sheetName } from "../utils/credentials";
 import { BailifDataType } from "../zod-json/dataJsonSchema";
-import { GOOGLE_SHEETS_ACCOUNT } from "./google-drive-api";
-
-const sheetName = "Dane";
-const auth = new GoogleAuth({
-  credentials: GOOGLE_SHEETS_ACCOUNT,
-  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-});
 
 const authClient =
-  (await auth.getClient()) as sheets_v4.Params$Resource$Spreadsheets$Values$Append["auth"];
+  (await sheetsAuth.getClient()) as sheets_v4.Params$Resource$Spreadsheets$Values$Append["auth"];
 const sheets = google.sheets({ version: "v4", auth: authClient });
 
 async function getLastRow(spreadsheetId: string): Promise<number> {
@@ -33,36 +26,34 @@ async function getLastRow(spreadsheetId: string): Promise<number> {
 }
 
 async function setRowStyles(spreadsheetId: string, rowIndex: number) {
-    const lastColumn = 18;
-    const sheetId = 0;
-  
-    const requests: sheets_v4.Schema$Request[] = [
-      {
-        updateBorders: {
-          range: {
-            sheetId,
-            startRowIndex: rowIndex - 1,
-            endRowIndex: rowIndex,
-            startColumnIndex: 0,
-            endColumnIndex: lastColumn,
-          },
-          top: { style: "SOLID", width: 1 },
-          bottom: { style: "SOLID", width: 1 },
-          left: { style: "SOLID", width: 1 },
-          right: { style: "SOLID", width: 1 },
+  const lastColumn = 18;
+  const sheetId = 0;
+
+  const requests: sheets_v4.Schema$Request[] = [
+    {
+      updateBorders: {
+        range: {
+          sheetId,
+          startRowIndex: rowIndex - 1,
+          endRowIndex: rowIndex,
+          startColumnIndex: 0,
+          endColumnIndex: lastColumn,
         },
+        top: { style: "SOLID", width: 1 },
+        bottom: { style: "SOLID", width: 1 },
+        left: { style: "SOLID", width: 1 },
+        right: { style: "SOLID", width: 1 },
       },
-    ];
-  
-    await sheets.spreadsheets.batchUpdate({
-      spreadsheetId,
-      requestBody: {
-        requests,
-      },
-    });
-  }
-  
-  
+    },
+  ];
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId,
+    requestBody: {
+      requests,
+    },
+  });
+}
 
 export async function uploadDataToSheet(
   spreadsheetId: string,

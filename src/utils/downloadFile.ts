@@ -1,10 +1,10 @@
 import fs from "fs";
 import { google } from "googleapis";
 import path from "path";
-import { auth } from "../google-apis/google-drive-api";
+import {driveAuth} from "../utils/credentials";
 
 export async function downloadFile(fileId: string, saveFolder: string, fileName: string) {
-  const drive = google.drive({ version: "v3", auth: auth });
+  const drive = google.drive({ version: "v3", auth: driveAuth });
 
   try {
     const res = await drive.files.get(
