@@ -45,4 +45,3 @@ export const BailifData = z.object({
 });
 
 export type BailifDataType = z.infer<typeof BailifData>;
-export type IndicatedAmountsSchemaType = z.infer<typeof IndicatedAmountsSchema>;
