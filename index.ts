@@ -9,6 +9,7 @@ import { downloadFile } from "./src/utils/downloadFile";
 import { logger } from "./src/utils/logger.ts";
 import "dotenv/config";
 import { parseOcrText } from "./src/zod-json/dataProcessor";
+import { sheetName } from "./src/utils/credentials";
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -32,7 +33,7 @@ async function processFile(fileName: string, fileId: string) {
 
     const fileLink = `https://drive.google.com/file/d/${fileId}/view`;
     if (fileLink && SPREADSHEET_ID) {
-      await uploadDataToSheet(SPREADSHEET_ID, "Dane", parsedData, fileLink);
+      await uploadDataToSheet(SPREADSHEET_ID, sheetName, parsedData, fileLink);
     } else {
       logger.error("File link or spreadsheetId was not created properly");
     }

@@ -12,7 +12,7 @@ export const FOLDER_ID = process.env.FOLDER_ID;
 export const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 export const PDF_DATA_FOLDER = path.join(__dirname, "ever-data");
 export const JSON_DATA_FOLDER = path.join(__dirname, "json-data");
-export const sheetName = "Dane" as const;
+export const sheetName = "Dane 2.0" as const;
 
 export const driveAuth = new google.auth.GoogleAuth({
   credentials: GOOGLE_SHEETS_ACCOUNT,

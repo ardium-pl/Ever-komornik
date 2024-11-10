@@ -25,6 +25,7 @@ const IndicatedAmountsSchema = z
     cashExpenses: z.number().optional(),
     clauseCosts: z.number().optional(),
     transferFee: z.number().optional(),
+    other: z.number().optional()
   })
   .transform((amounts) => ({
     ...amounts,

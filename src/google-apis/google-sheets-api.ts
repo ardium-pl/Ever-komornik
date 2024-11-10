@@ -2,6 +2,7 @@ import { google, sheets_v4 } from "googleapis";
 import { sheetsAuth, sheetName } from "../utils/credentials";
 import { BailifDataType } from "../zod-json/dataJsonSchema";
 import { logger } from "../utils/logger";
+import { hasExactLetters } from "../utils/replacePolishCharacters";
 
 const authClient =
   (await sheetsAuth.getClient()) as sheets_v4.Params$Resource$Spreadsheets$Values$Append["auth"];
@@ -65,6 +66,19 @@ export async function uploadDataToSheet(
   const lastRow = await getLastRow(spreadsheetId);
   const nextRow = lastRow + 1;
   const range = `${sheetName}!A${nextRow}`;
+
+  const bankAccountNumber = hasExactLetters(
+    data.caseDetails.bankAccountNumber,
+    26
+  )
+    ? data.caseDetails.bankAccountNumber
+    : "Odczytany numer jest niepoprawny, sprawdź ręcznie";
+
+  const nipNumber = data.personalInfo.distrainee.nipNumber
+    ? hasExactLetters(data.personalInfo.distrainee.nipNumber, 10)
+      ? data.personalInfo.distrainee.nipNumber
+      : "Odczytany numer jest niepoprawny, sprawdź ręcznie"
+    : undefined;
 
   const values = [
     [
