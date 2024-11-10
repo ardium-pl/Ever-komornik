@@ -27,9 +27,7 @@ export function replacePolishCharacters(str: string): string {
 }
 
 export function hasExactLetters(input: string, numLetters: number): boolean {
-  // Remove all spaces from the input string
   const cleanedString = input.replace(/\s+/g, "");
 
-  // Check if the length of the cleaned string matches the specified number of letters
   return cleanedString.length === numLetters;
 }
