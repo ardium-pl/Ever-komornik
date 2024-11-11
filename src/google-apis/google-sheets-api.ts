@@ -1,6 +1,9 @@
 import { google, sheets_v4 } from "googleapis";
 import { sheetsAuth, sheetName } from "../utils/credentials";
-import { BailifDataType } from "../zod-json/dataJsonSchema";
+import {
+  BailifDataType,
+  IndicatedAmountsSchemaType,
+} from "../zod-json/dataJsonSchema";
 import { logger } from "../utils/logger";
 import { hasExactLetters } from "../utils/replacePolishCharacters";
 
@@ -60,7 +63,7 @@ async function setRowStyles(spreadsheetId: string, rowIndex: number) {
 export async function uploadDataToSheet(
   spreadsheetId: string,
   sheetName: string,
-  data: BailifDataType,
+  data: BailifDataType & IndicatedAmountsSchemaType,
   fileLink: string
 ) {
   const lastRow = await getLastRow(spreadsheetId);
@@ -91,16 +94,16 @@ export async function uploadDataToSheet(
       data.personalInfo.bailif.phoneNumber,
       data.caseDetails.kmNumber,
       bankAccountNumber,
-      data.financials.sumOfAllCosts,
-      data.financials.principal,
-      data.financials.interest,
-      data.financials.courtCosts,
-      data.financials.clauseCosts,
-      data.financials.costsOfPreviousEnforcement,
-      data.financials.executionFee,
-      data.financials.cashExpenses,
-      data.financials.transferFee,
-      data.financials.other
+      data.sumOfAllCosts,
+      data.principal,
+      data.interest,
+      data.courtCosts,
+      data.clauseCosts,
+      data.costsOfPreviousEnforcement,
+      data.executionFee,
+      data.cashExpenses,
+      data.transferFee,
+      data.other
     ],
   ];
 

@@ -15,7 +15,7 @@ const BailifSchema = z.object({
   mail: z.string(),
 });
 
-const IndicatedAmountsSchema = z
+export const IndicatedAmountsSchema = z
   .object({
     principal: z.number().optional(),
     interest: z.number().optional(),
@@ -42,7 +42,8 @@ export const BailifData = z.object({
     bankAccountNumber: z.string(),
     companyIdentification: z.string(),
   }),
-  financials: IndicatedAmountsSchema,
+  // financials: IndicatedAmountsSchema,
 });
 
 export type BailifDataType = z.infer<typeof BailifData>;
+export type IndicatedAmountsSchemaType = z.infer<typeof IndicatedAmountsSchema>;

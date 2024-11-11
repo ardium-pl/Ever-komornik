@@ -1,22 +1,19 @@
-import express from "express";
+import "dotenv/config";
 import fs from "fs-extra";
 import path from "path";
-import { uploadDataToSheet } from "./src/google-apis/google-sheets-api";
 import { listAllFiles } from "./src/google-apis/google-drive-api.ts";
+import { uploadDataToSheet } from "./src/google-apis/google-sheets-api";
 import { pdfOcr } from "./src/ocr/ocr.ts";
-import { FOLDER_ID, PDF_DATA_FOLDER, JSON_DATA_FOLDER, SPREADSHEET_ID } from "./src/utils/credentials";
+import {
+  FOLDER_ID,
+  JSON_DATA_FOLDER,
+  PDF_DATA_FOLDER,
+  sheetName,
+  SPREADSHEET_ID,
+} from "./src/utils/credentials";
 import { downloadFile } from "./src/utils/downloadFile";
 import { logger } from "./src/utils/logger.ts";
-import "dotenv/config";
-import { parseOcrText } from "./src/zod-json/dataProcessor";
-import { sheetName } from "./src/utils/credentials";
-
-const PORT = process.env.PORT || 3000;
-const app = express();
-
-app.listen(PORT, () => {
-  logger.info(`Server is running on port ${PORT}`);
-});
+import { parseAllData } from "./src/zod-json/dataProcessor";
 
 async function processFile(fileName: string, fileId: string) {
   try {
@@ -28,8 +25,7 @@ async function processFile(fileName: string, fileId: string) {
     const ocrDataText = await pdfOcr(pdfFilePath);
     logger.info(`📄 OCR Data Text: ${ocrDataText}`);
 
-    const parsedData = await parseOcrText(ocrDataText);
-    logger.info("JSON Schema: ", parsedData);
+    const parsedData = await parseAllData(ocrDataText);
 
     const fileLink = `https://drive.google.com/file/d/${fileId}/view`;
     if (fileLink && SPREADSHEET_ID) {
@@ -59,10 +55,10 @@ async function main() {
         logger.info("No files found to process.");
         return;
       }
-      for(const file of files){
+      for (const file of files) {
         await processFile(file.name!, file.id!);
       }
-    //   await Promise.all(files.map((file) => processFile(file.name!, file.id!)));
+      //   await Promise.all(files.map((file) => processFile(file.name!, file.id!)));
       logger.info("All files processed successfully.");
     }
   } catch (err) {
