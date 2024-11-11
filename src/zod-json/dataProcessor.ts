@@ -24,6 +24,14 @@ export async function parseOcrText(ocrText: string): Promise<BailifDataType> {
               - Some terms may vary in Polish (e.g., "Koszty procesu" and "Koszty sądowe" refer to the same costs but are written differently). Watch for these variations in data.
               - "Koszty klauzuli" are pretty rare, so expect that they are mostly not mentioned in the data, they are always written as "Koszty klauzuli".
               - Sometimes there might be costs that doesnt fit to any of the properties in schema. When they dont, add them to the property 'other'. If there are more than once, sum them all up and assing to property other aswell.
+              - Here are some examples, how to assing values to their keys properly:
+                  * "principal" - values from "Należność główna",
+                  * "interest" - values from "Odsetki ...",
+                  * "courCosts" - values from "Koszty procesu" or "Koszty sądowe",
+                  * "costsOfPreviousEnforcement" - values from "Koszty poprzedniej egzekucji",
+                  * "executionFee" - values from "Opłata egzekucyjna",
+                  * "cashExpenses" - values from "Wydatki gotówkowe",
+                  * "clauseCosts" - values from "Koszty klauzuli",
             4. Detect if the phrase "Do każdej przekazywanej kwoty należy doliczyć opłatę za przelew ..." appears in the OCR text. If it does:
               - Extract the fee amount mentioned after this phrase.
             5. companyIdentification is always a name of the company as a string, mostly begins with the name 'Ever ...', 'Rotero ...', 'Universal ...', 'Proscan ...' and other comapnies that ends wit 'z o.o.'. Dont treat companies with 'Fundusz' in their names as proper name.
@@ -31,6 +39,7 @@ export async function parseOcrText(ocrText: string): Promise<BailifDataType> {
             7. Sometimes peselNumber might not occur in the data, when it's not provided, just use the key peselNumber as optional.
             8. Assign name and lastName in the format 'John', 'Doe', also first letter is capital and other are lower.
             9. While inserting bankAccountNumber, use format '00 0000 0000 0000 0000 0000 0000', so remember to place spaces.
+            10. In phoneNumber use format '000 000 000',
           `,
       },
       { role: "user", content: ocrText },

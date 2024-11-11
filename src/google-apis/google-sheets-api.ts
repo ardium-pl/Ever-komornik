@@ -86,11 +86,11 @@ export async function uploadDataToSheet(
       data.caseDetails.companyIdentification,
       `${data.personalInfo.distrainee.name} ${data.personalInfo.distrainee.lastName}`,
       data.personalInfo.distrainee.peselNumber,
-      data.personalInfo.distrainee.nipNumber,
+      nipNumber,
       `${data.personalInfo.bailif.name} ${data.personalInfo.bailif.lastName}`,
       data.personalInfo.bailif.phoneNumber,
       data.caseDetails.kmNumber,
-      data.caseDetails.bankAccountNumber,
+      bankAccountNumber,
       data.financials.sumOfAllCosts,
       data.financials.principal,
       data.financials.interest,
@@ -100,6 +100,7 @@ export async function uploadDataToSheet(
       data.financials.executionFee,
       data.financials.cashExpenses,
       data.financials.transferFee,
+      data.financials.other
     ],
   ];
 
