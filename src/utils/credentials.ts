@@ -12,7 +12,7 @@ export const FOLDER_ID = process.env.FOLDER_ID;
 export const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 export const PDF_DATA_FOLDER = path.join(__dirname, "ever-data");
 export const JSON_DATA_FOLDER = path.join(__dirname, "json-data");
-export const sheetName = "Dane 4.0" as const;
+export const sheetName = "Benchmark" as const;
 
 export const driveAuth = new google.auth.GoogleAuth({
   credentials: GOOGLE_SHEETS_ACCOUNT,
@@ -33,8 +33,8 @@ export const getGeneralInformationPrompt = `
             4. In the kmNumber don't write the letters 'Km' as a prefix. Sometimes kmNumber is provided as 'Numer zawiadomienia', but its really rare.
             5. Sometimes peselNumber might not occur in the data, when it's not provided, just use the key peselNumber as optional.
             6. Assign name and lastName in the format 'John', 'Doe', also first letter is capital and other are lower.
-            7. While inserting bankAccountNumber, use format '00 0000 0000 0000 0000 0000 0000', so remember to place spaces.
-            8. In phoneNumber use format '000 000 000',
+            7. While inserting bankAccountNumber, use format '00 0000 0000 0000 0000 0000 0000', so remember to place spaces, but when its not provided, just use undefined.
+            8. In phoneNumber use format '000 000 000', but when its not provided, just use undefined.
           ` as const;
 
 export const getCostInformationPrompt = `
@@ -61,11 +61,15 @@ export const getCostInformationPrompt = `
                   | **downPaymentMadeByTheOwner**                    | "Zaliczka wpłacona przez właściciela"                      |
                   | **legallyEstablishedBailiffCosts**               | "Prawomocnie ustalone koszty komornicze"                   |
                   | **deposit**                                      | "Depozyt"                                                  |
+                  | **alimonyArrearsToCreditor**                     | "Alimenty zaległe na rzecz wierzyciela"                    |
+                  | **arrearsForTheLiquidatorOfTheMaintenanceFund**  | "Zaległość dla likwidatora Funduszu alimentacyjnego"       |
                   | **balanceOfOutstandingAdvance**                  | "Saldo nierozliczonej zaliczki"                            |
                   | **enforcementCosts**                             | "Kwota kosztów egzekucyjnych"                              |
+                  | **currentAlimony**                               | "Alimenty bieżące"                                         |
                   | **other**                                        | Sum of any other costs not matching above categories (use sparingly)|
             4. Detect if the phrase "Do każdej przekazywanej kwoty należy doliczyć opłatę za przelew ..." appears in the OCR text. If it does:
               - Extract the fee amount mentioned after this phrase.
+            5. Sometimes there might be already written sum of all costs, but dont care about it and dont assign it to any key, just skip this value.
 
             **Note**:
             - Be precise in matching terms, considering possible variations.

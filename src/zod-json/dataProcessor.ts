@@ -44,7 +44,7 @@ async function _getGptResponse<T extends ZodType<any, ZodTypeDef, any>>(
       { role: "system", content: systemMessage },
       { role: "user", content: ocrText },
     ],
-    temperature: 0.5,
+    // temperature: 0.65,
     response_format: zodResponseFormat(dataSchema, schemaName),
   });
 

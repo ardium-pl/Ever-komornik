@@ -32,6 +32,9 @@ export const IndicatedAmountsSchema = z
     enforcementCosts: z.number().optional(),
     deposit: z.number().optional(),
     balanceOfOutstandingAdvance: z.number().optional(),
+    alimonyArrearsToCreditor: z.number().optional(),
+    arrearsForTheLiquidatorOfTheMaintenanceFund: z.number().optional(),
+    currentAlimony: z.number().optional(),
     other: z.number().optional()
   })
   .transform((amounts) => ({
@@ -49,7 +52,6 @@ export const BailifData = z.object({
     bankAccountNumber: z.string(),
     companyIdentification: z.string(),
   }),
-  // financials: IndicatedAmountsSchema,
 });
 
 export type BailifDataType = z.infer<typeof BailifData>;

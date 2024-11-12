@@ -75,12 +75,18 @@ export async function uploadDataToSheet(
     26
   )
     ? data.caseDetails.bankAccountNumber
-    : "Odczytany numer jest niepoprawny, sprawdź ręcznie";
+    : `Odczytany numer jest niepoprawny(${data.caseDetails.bankAccountNumber}), sprawdź ręcznie`;
+
+  const peselNumber = data.personalInfo.distrainee.peselNumber
+    ? hasExactLetters(data.personalInfo.distrainee.peselNumber, 11)
+      ? data.personalInfo.distrainee.peselNumber
+      : `Odczytany numer jest niepoprawny(${data.personalInfo.distrainee.peselNumber}), sprawdź ręcznie`
+    : undefined;
 
   const nipNumber = data.personalInfo.distrainee.nipNumber
     ? hasExactLetters(data.personalInfo.distrainee.nipNumber, 10)
       ? data.personalInfo.distrainee.nipNumber
-      : "Odczytany numer jest niepoprawny, sprawdź ręcznie"
+      : `Odczytany numer jest niepoprawny(${data.personalInfo.distrainee.nipNumber}), sprawdź ręcznie`
     : undefined;
 
   const values = [
@@ -88,7 +94,7 @@ export async function uploadDataToSheet(
       fileLink,
       data.caseDetails.companyIdentification,
       `${data.personalInfo.distrainee.name} ${data.personalInfo.distrainee.lastName}`,
-      data.personalInfo.distrainee.peselNumber,
+      peselNumber,
       nipNumber,
       `${data.personalInfo.bailif.name} ${data.personalInfo.bailif.lastName}`,
       data.personalInfo.bailif.phoneNumber,
@@ -108,9 +114,12 @@ export async function uploadDataToSheet(
       data.downPaymentMadeByTheOwner,
       data.legallyEstablishedBailiffCosts,
       data.deposit,
+      data.currentAlimony,
+      data.alimonyArrearsToCreditor,
+      data.arrearsForTheLiquidatorOfTheMaintenanceFund,
       data.balanceOfOutstandingAdvance,
       data.enforcementCosts,
-      data.other
+      data.other,
     ],
   ];
 
@@ -126,7 +135,7 @@ export async function uploadDataToSheet(
 
     logger.info("Data uploaded successfully:", response.data);
 
-    await setRowStyles(spreadsheetId, nextRow);
+    // await setRowStyles(spreadsheetId, nextRow);
   } catch (error) {
     logger.error("Error uploading data:", error);
   }
