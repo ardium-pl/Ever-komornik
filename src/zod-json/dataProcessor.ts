@@ -17,25 +17,26 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 export async function parseAllData(ocrText: string): Promise<BailifDataType & IndicatedAmountsSchemaType> {
-  return {...(await _parseGeneralInformation(ocrText)),...(await _parseCostInformation(ocrText))}
+  return {...(await _parseGeneralInformation(ocrText)),...(await _parseCostsInformation(ocrText))}
 }
 
 async function _parseGeneralInformation(
   ocrText: string
 ): Promise<BailifDataType> {
-  return _getGptResponse(getGeneralInformationPrompt, ocrText, BailifData);
+  return _getGptResponse(getGeneralInformationPrompt, ocrText, BailifData, "bailifdata");
 }
 
-async function _parseCostInformation(
+async function _parseCostsInformation(
   ocrText: string
 ): Promise<IndicatedAmountsSchemaType> {
-  return _getGptResponse(getCostInformationPrompt, ocrText, IndicatedAmountsSchema);
+  return _getGptResponse(getCostInformationPrompt, ocrText, IndicatedAmountsSchema, "costsdata");
 }
 
 async function _getGptResponse<T extends ZodType<any, ZodTypeDef, any>>(
   systemMessage: string,
   ocrText: string,
-  dataSchema: T
+  dataSchema: T,
+  schemaName: string,
 ): Promise<T["_output"]> {
   const rawResponse = await client.beta.chat.completions.parse({
     model: "gpt-4o-2024-08-06",
@@ -44,7 +45,7 @@ async function _getGptResponse<T extends ZodType<any, ZodTypeDef, any>>(
       { role: "user", content: ocrText },
     ],
     temperature: 0.5,
-    response_format: zodResponseFormat(dataSchema, "bailifData"),
+    response_format: zodResponseFormat(dataSchema, schemaName),
   });
 
   const message = rawResponse.choices[0]?.message;

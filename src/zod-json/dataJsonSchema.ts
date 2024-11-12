@@ -20,11 +20,18 @@ export const IndicatedAmountsSchema = z
     principal: z.number().optional(),
     interest: z.number().optional(),
     courtCosts: z.number().optional(),
-    costsOfPreviousEnforcement: z.number().optional(),
     executionFee: z.number().optional(),
     cashExpenses: z.number().optional(),
     clauseCosts: z.number().optional(),
     transferFee: z.number().optional(),
+    costsOfPreviousEnforcement: z.number().optional(),
+    costsOfRepresentationInTheEncforcementsProcess: z.number().optional(),
+    projectedRelativeFee: z.number().optional(),
+    downPaymentMadeByTheOwner: z.number().optional(),
+    legallyEstablishedBailiffCosts: z.number().optional(),
+    enforcementCosts: z.number().optional(),
+    deposit: z.number().optional(),
+    balanceOfOutstandingAdvance: z.number().optional(),
     other: z.number().optional()
   })
   .transform((amounts) => ({

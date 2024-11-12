@@ -32,7 +32,7 @@ async function getLastRow(spreadsheetId: string): Promise<number> {
 
 async function setRowStyles(spreadsheetId: string, rowIndex: number) {
   const lastColumn = 18;
-  const sheetId = 0;
+  const sheetId = 1;
 
   const requests: sheets_v4.Schema$Request[] = [
     {
@@ -103,6 +103,13 @@ export async function uploadDataToSheet(
       data.executionFee,
       data.cashExpenses,
       data.transferFee,
+      data.costsOfRepresentationInTheEncforcementsProcess,
+      data.projectedRelativeFee,
+      data.downPaymentMadeByTheOwner,
+      data.legallyEstablishedBailiffCosts,
+      data.deposit,
+      data.balanceOfOutstandingAdvance,
+      data.enforcementCosts,
       data.other
     ],
   ];
