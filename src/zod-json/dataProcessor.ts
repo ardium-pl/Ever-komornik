@@ -1,17 +1,17 @@
 import "dotenv/config";
 import OpenAI from "openai";
+import { zodResponseFormat } from "openai/helpers/zod";
 import { ZodType, ZodTypeDef } from "zod";
+import {
+  getCostInformationPrompt,
+  getGeneralInformationPrompt,
+} from "../utils/credentials";
 import {
   BailifData,
   BailifDataType,
   IndicatedAmountsSchema,
-  IndicatedAmountsSchemaType,
+  IndicatedAmountsSchemaType
 } from "./dataJsonSchema";
-import { zodResponseFormat } from "openai/helpers/zod";
-import {
-  getGeneralInformationPrompt,
-  getCostInformationPrompt,
-} from "../utils/credentials";
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -39,12 +39,12 @@ async function _getGptResponse<T extends ZodType<any, ZodTypeDef, any>>(
   schemaName: string,
 ): Promise<T["_output"]> {
   const rawResponse = await client.beta.chat.completions.parse({
-    model: "gpt-4o-2024-08-06",
+    model: 'gpt-4o',
     messages: [
       { role: "system", content: systemMessage },
       { role: "user", content: ocrText },
     ],
-    // temperature: 0.65,
+    // temperature: 0.7,
     response_format: zodResponseFormat(dataSchema, schemaName),
   });
 

@@ -12,7 +12,7 @@ export const FOLDER_ID = process.env.FOLDER_ID;
 export const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 export const PDF_DATA_FOLDER = path.join(__dirname, "ever-data");
 export const JSON_DATA_FOLDER = path.join(__dirname, "json-data");
-export const sheetName = "Benchmark" as const;
+export const sheetName = "Dane 4.2" as const;
 
 export const driveAuth = new google.auth.GoogleAuth({
   credentials: GOOGLE_SHEETS_ACCOUNT,
@@ -34,46 +34,50 @@ export const getGeneralInformationPrompt = `
             5. Sometimes peselNumber might not occur in the data, when it's not provided, just use the key peselNumber as optional.
             6. Assign name and lastName in the format 'John', 'Doe', also first letter is capital and other are lower.
             7. While inserting bankAccountNumber, use format '00 0000 0000 0000 0000 0000 0000', so remember to place spaces, but when its not provided, just use undefined.
-            8. In phoneNumber use format '000 000 000', but when its not provided, just use undefined.
+            8. In phoneNumber use format '000 000 000', but when its not provided, just use undefined. Don't parse 0 at the begining of the phone number, even it it's provided.
           ` as const;
 
+
 export const getCostInformationPrompt = `
-            You are an expert in parsing bailiff enforcement costs data from OCR text. Extract the relevant information and structure it according to the provided schema. 
-            Please remember to obey these rules:
-            1. Extract all relevant costs data available
-            2. Ensure all numeric data are numbers, not strings.
-            3. For indicatedAmounts:
-              - Some terms may vary in Polish (e.g., "Koszty procesu" and "Koszty sądowe" refer to the same costs but are written differently). Watch for these variations in data.
-              - "Koszty klauzuli" are pretty rare, so expect that they are mostly not mentioned in the data, they are always written as "Koszty klauzuli".
-              - (USE ONLY IN CRITICAL CASES!) Sometimes there might be costs that doesnt fit to any of the properties in schema. When they dont, add them to the property 'other'. If there are more than once, sum them all up and assing to property other aswell.
-              - Here are some examples, how to assing values to their keys properly:
-                  | **Schema Key**                                   | **Polish Term(s)**                                         |
-                  |--------------------------------------------------|------------------------------------------------------------|
-                  | **principal**                                    | "Należność główna"                                         |
-                  | **interest**                                     | "Odsetki ..."                                              |
-                  | **courtCosts**                                   | "Koszty procesu", "Koszty sądowe"                          |
-                  | **costsOfPreviousEnforcement**                   | "Koszty poprzedniej egzekucji"                             |
-                  | **executionFee**                                 | "Opłata egzekucyjna"                                       |
-                  | **cashExpenses**                                 | "Wydatki gotówkowe"                                        |
-                  | **clauseCosts**                                  | "Koszty klauzuli" (rare, always written as such)           |
-                  | **costsOfRepresentationInTheEnforcementProcess** | "Koszty zastępowania w procesie egzekucyjnym"              |
-                  | **projectedRelativeFee**                         | "Prognozowana opłata stosunkowa"                           |
-                  | **downPaymentMadeByTheOwner**                    | "Zaliczka wpłacona przez właściciela"                      |
-                  | **legallyEstablishedBailiffCosts**               | "Prawomocnie ustalone koszty komornicze"                   |
-                  | **deposit**                                      | "Depozyt"                                                  |
-                  | **alimonyArrearsToCreditor**                     | "Alimenty zaległe na rzecz wierzyciela"                    |
-                  | **arrearsForTheLiquidatorOfTheMaintenanceFund**  | "Zaległość dla likwidatora Funduszu alimentacyjnego"       |
-                  | **balanceOfOutstandingAdvance**                  | "Saldo nierozliczonej zaliczki"                            |
-                  | **enforcementCosts**                             | "Kwota kosztów egzekucyjnych"                              |
-                  | **currentAlimony**                               | "Alimenty bieżące"                                         |
-                  | **other**                                        | Sum of any other costs not matching above categories (use sparingly)|
-            4. Detect if the phrase "Do każdej przekazywanej kwoty należy doliczyć opłatę za przelew ..." appears in the OCR text. If it does:
-              - Extract the fee amount mentioned after this phrase.
-            5. Sometimes there might be already written sum of all costs, but dont care about it and dont assign it to any key, just skip this value.
+          You are an expert in parsing bailiff enforcement costs data from OCR text. Extract the relevant information and structure it according to the provided schema. 
+          Please remember to obey these rules:
+          1. Ensure all numeric data are numbers, not strings.
+          2. Use only amounts that include 'zł' directly after the number. Exclude values that lack 'zł'.
+             - Examples:
+               - Correct: '123.10 zł' (✓)  
+               - Incorrect: '123.10' (✘) – **do not use values like this**
+          3. For indicatedAmounts:
+            - Some terms may vary in Polish (e.g., "Koszty procesu" and "Koszty sądowe" refer to the same costs but are written differently). Watch for these variations in data.
+            - "Koszty klauzuli" are pretty rare, so expect that they are mostly not mentioned in the data, and they are always written as "Koszty klauzuli."
+            - (USE ONLY IN CRITICAL CASES!) Sometimes there might be costs that don't fit any of the properties in the schema. When this happens, add them to the "other" property. If there are multiple, sum them up and assign the total to "other" as well.
+            - Use the following guidelines to match terms with schema keys:
 
-            **Note**:
-            - Be precise in matching terms, considering possible variations.
-            - If a term is not present in the OCR text, you may omit that key or set it to null, depending on schema requirements.
+                | **Schema Key**                                   | **Polish Term(s)**                                         |
+                |--------------------------------------------------|------------------------------------------------------------|
+                | **principal**                                    | "Należność główna"                                         |
+                | **interest**                                     | "Odsetki ..."                                              |
+                | **courtCosts**                                   | "Koszty procesu", "Koszty sądowe"                          |
+                | **costsOfPreviousEnforcement**                   | "Koszty poprzedniej egzekucji"                             |
+                | **executionFee**                                 | "Opłata egzekucyjna"                                       |
+                | **cashExpenses**                                 | "Wydatki gotówkowe"                                        |
+                | **clauseCosts**                                  | "Koszty klauzuli" (rare, always written as such)           |
+                | **costsOfRepresentationInTheEnforcementProcess** | "Koszty zastępowania w procesie egzekucyjnym"              |
+                | **projectedRelativeFee**                         | "Prognozowana opłata stosunkowa"                           |
+                | **legallyEstablishedBailiffCosts**               | "Prawomocnie ustalone koszty komornicze"                   |
+                | **currentAndArrearsAlimony**                     | "Alimenty bieżące" or "Alimenty zaległe"                   |
+                | **arrearsForTheLiquidatorOfTheMaintenanceFund**  | "Zaległość dla likwidatora Funduszu alimentacyjnego"       |
+                | **balanceOfOutstandingAdvance**                  | "Saldo nierozliczonej zaliczki"                            |
+                | **enforcementCosts**                             | "Kwota kosztów egzekucyjnych"                              |
+                | **other**                                        | Sum of any other costs not matching above categories (use sparingly)|
 
-            
+          4. Detect if the phrase "Do każdej przekazywanej kwoty należy doliczyć opłatę za przelew ..." appears in the OCR text. If it does:
+            - Extract the fee amount mentioned after this phrase, ensuring it includes "zł".
+
+          5. Don’t assign any values after the statement with the word 'Razem ... ' or 'Ogółem do zapłaty ...'. Example: ‘Razem 123.10 zł’ – ignore any values that appear after "Razem."
+
+          6. Use each value only once in the assignment.
+
+          **Note**:
+          - Match terms precisely, considering possible variations.
+          - If a term is not present in the OCR text, omit that key or set it to null, depending on schema requirements.
 ` as const;

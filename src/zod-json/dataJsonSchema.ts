@@ -27,14 +27,11 @@ export const IndicatedAmountsSchema = z
     costsOfPreviousEnforcement: z.number().optional(),
     costsOfRepresentationInTheEncforcementsProcess: z.number().optional(),
     projectedRelativeFee: z.number().optional(),
-    downPaymentMadeByTheOwner: z.number().optional(),
     legallyEstablishedBailiffCosts: z.number().optional(),
     enforcementCosts: z.number().optional(),
-    deposit: z.number().optional(),
     balanceOfOutstandingAdvance: z.number().optional(),
-    alimonyArrearsToCreditor: z.number().optional(),
+    overdueAndCurrentAlimony: z.number().optional(),
     arrearsForTheLiquidatorOfTheMaintenanceFund: z.number().optional(),
-    currentAlimony: z.number().optional(),
     other: z.number().optional()
   })
   .transform((amounts) => ({
@@ -53,6 +50,7 @@ export const BailifData = z.object({
     companyIdentification: z.string(),
   }),
 });
+
 
 export type BailifDataType = z.infer<typeof BailifData>;
 export type IndicatedAmountsSchemaType = z.infer<typeof IndicatedAmountsSchema>;

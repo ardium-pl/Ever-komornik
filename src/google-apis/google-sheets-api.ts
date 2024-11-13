@@ -1,11 +1,11 @@
 import { google, sheets_v4 } from "googleapis";
-import { sheetsAuth, sheetName } from "../utils/credentials";
-import {
-  BailifDataType,
-  IndicatedAmountsSchemaType,
-} from "../zod-json/dataJsonSchema";
+import { sheetName, sheetsAuth } from "../utils/credentials";
 import { logger } from "../utils/logger";
 import { hasExactLetters } from "../utils/replacePolishCharacters";
+import {
+  BailifDataType,
+  IndicatedAmountsSchemaType
+} from "../zod-json/dataJsonSchema";
 
 const authClient =
   (await sheetsAuth.getClient()) as sheets_v4.Params$Resource$Spreadsheets$Values$Append["auth"];
@@ -111,11 +111,8 @@ export async function uploadDataToSheet(
       data.transferFee,
       data.costsOfRepresentationInTheEncforcementsProcess,
       data.projectedRelativeFee,
-      data.downPaymentMadeByTheOwner,
       data.legallyEstablishedBailiffCosts,
-      data.deposit,
-      data.currentAlimony,
-      data.alimonyArrearsToCreditor,
+      data.overdueAndCurrentAlimony,
       data.arrearsForTheLiquidatorOfTheMaintenanceFund,
       data.balanceOfOutstandingAdvance,
       data.enforcementCosts,

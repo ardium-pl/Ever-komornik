@@ -53,7 +53,7 @@ export async function pdfOcr(pdfFilePath: string): Promise<string> {
       })
     );
 
-    const concatenatedResults = ocrResults.join("\n");
+    const concatenatedResults = ocrResults.join("");
 
     await _saveDataToTxt(
       outputTextFolder,
