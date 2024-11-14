@@ -10,36 +10,53 @@ import {
   BailifData,
   BailifDataType,
   IndicatedAmountsSchema,
-  IndicatedAmountsSchemaType
+  IndicatedAmountsSchemaType,
 } from "./dataJsonSchema";
+import fs from "fs";
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-export async function parseAllData(ocrText: string): Promise<BailifDataType & IndicatedAmountsSchemaType> {
-  return {...(await _parseGeneralInformation(ocrText)),...(await _parseCostsInformation(ocrText))}
+
+export async function parseAllData(
+  ocrText: string
+): Promise<BailifDataType & IndicatedAmountsSchemaType> {
+  return {
+    ...(await _parseGeneralInformation(ocrText)),
+    ...(await _parseCostsInformation(ocrText)),
+  };
 }
 
 async function _parseGeneralInformation(
   ocrText: string
 ): Promise<BailifDataType> {
-  return _getGptResponse(getGeneralInformationPrompt, ocrText, BailifData, "bailifdata");
+  return _getGptResponse(
+    getGeneralInformationPrompt,
+    ocrText,
+    BailifData,
+    "bailifdata"
+  );
 }
 
 async function _parseCostsInformation(
   ocrText: string
 ): Promise<IndicatedAmountsSchemaType> {
-  return _getGptResponse(getCostInformationPrompt, ocrText, IndicatedAmountsSchema, "costsdata");
+  return _getGptResponse(
+    getCostInformationPrompt,
+    ocrText,
+    IndicatedAmountsSchema,
+    "costsdata"
+  );
 }
 
 async function _getGptResponse<T extends ZodType<any, ZodTypeDef, any>>(
   systemMessage: string,
   ocrText: string,
   dataSchema: T,
-  schemaName: string,
+  schemaName: string
 ): Promise<T["_output"]> {
   const rawResponse = await client.beta.chat.completions.parse({
-    model: 'gpt-4o',
+    model: "gpt-4o",
     messages: [
       { role: "system", content: systemMessage },
       { role: "user", content: ocrText },
