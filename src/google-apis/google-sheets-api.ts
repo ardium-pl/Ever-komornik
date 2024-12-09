@@ -71,7 +71,7 @@ export async function uploadDataToSheet(
   const range = `${sheetName}!A${nextRow}`;
 
   const bankAccountNumber = hasExactLetters(
-    data.caseDetails.bankAccountNumber,
+    data.caseDetails.bankAccountNumber!,
     26
   )
     ? data.caseDetails.bankAccountNumber

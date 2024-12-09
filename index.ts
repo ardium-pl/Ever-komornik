@@ -27,6 +27,8 @@ async function processFile(fileName: string, fileId: string) {
 
     const parsedData = await parseAllData(ocrDataText);
 
+    logger.info("parsed data" + JSON.stringify(parsedData));
+
     const fileLink = `https://drive.google.com/file/d/${fileId}/view`;
     if (fileLink && SPREADSHEET_ID) {
       await uploadDataToSheet(SPREADSHEET_ID, sheetName, parsedData, fileLink);

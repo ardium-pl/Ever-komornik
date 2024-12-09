@@ -1,6 +1,6 @@
 import { drive_v3, google } from "googleapis";
 import { GaxiosResponse } from "googleapis-common";
-import { driveAuth } from "../utils/credentials";
+import { driveAuth, FOLDER_ID } from "../utils/credentials";
 import { logger } from "../utils/logger";
 
 export async function listAllFiles(folderId: string): Promise<drive_v3.Schema$File[]> {
@@ -51,3 +51,5 @@ export async function listAllFiles(folderId: string): Promise<drive_v3.Schema$Fi
 
   return await listFilesInFolder(folderId);
 }
+
+console.log(await listAllFiles(FOLDER_ID!));
